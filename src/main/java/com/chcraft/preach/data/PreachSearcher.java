@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PreachSearcher {
-	private static String[] TESTAMENTS = {"창세기",
+	public static String[] TESTAMENTS = {"창세기",
 										  "출애굽기",
 										  "레위기",
 										  "민수기",
@@ -134,7 +134,7 @@ public class PreachSearcher {
 		}
 	}
 	
-	public static List<Preach> getPreachListByYearAndMonth(int year, int month){
+	public static List<Preach> search(int year, int month){
 		List<Preach> result;
 		//if year does not exist, return empty List
 		if(!indexingByDate.containsKey(year)) {
@@ -150,7 +150,7 @@ public class PreachSearcher {
 		return result;
 	}
 	
-	public static List<Preach> getPreachListByTestamentAndChapter(String testament, int chapter){
+	public static List<Preach> search(String testament, int chapter){
 		List<Preach> result;
 		//if testament not exist(that's not going to happen.), return empty List
 		if(!indexingByTestament.containsKey(testament)) {

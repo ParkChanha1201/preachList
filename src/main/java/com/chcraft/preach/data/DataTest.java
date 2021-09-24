@@ -4,24 +4,43 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 public class DataTest {
+	final static int DATA_COUNT = 5000;
+	
+	final static int YEAR_LOW = 2000;
+	final static int YEAR_HIGH = 2021;
+	final static int MONTH_LOW = 1;
+	final static int MONTH_HIGH = 12;
+	final static int DATE_LOW = 1;
+	final static int DATE_HIGH = 31;
+	
+	final static int CHAPTER_LOW = 1;
+	final static int CHAPTER_HIGH = 150;
+	
+	final static int VERSE_LOW = 1;
+	final static int VERSE_HIGH = 99;
+	
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		File file = new File("./data/data");
-		
-		Preach p1 = new Preach(2021, 9, 24, "오늘 설교", "요한복음", 1, 1, 3);
-		Preach p2 = new Preach(2021, 12, 24, "오늘 설교", "창세기", 5, 3, 3);
+
 		
 		//test with List
 		List<Preach> test = new ArrayList<>();
 		
-		test.add(p1);
-		test.add(p2);
+		//generate data and save
+		for(int i = 0; i < DATA_COUNT; i++) {
+			Preach preach = generateData();
+			test.add(preach);
+		}
 
 		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
 			ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));) {
@@ -52,24 +71,16 @@ public class DataTest {
 				ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));) {
 				//write to file
 				out.writeObject(test);
-				out.writeObject(p1);
-				out.writeObject(p2);
 				
 				//read test
 				Object data = in.readObject();
-				Object data2 = in.readObject();
-				Object data3 = in.readObject();
 				
 				Preach[] list = (Preach[])data;				
-				Preach pp1 = (Preach)data2;
-				Preach pp2 = (Preach)data3;
 				
 				for(Preach preach : list) {
 					System.out.println(preach);
 				}
 				
-				System.out.println(pp1);
-				System.out.println(pp2);
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
@@ -80,17 +91,106 @@ public class DataTest {
 		//데이터 검색 테스트
 		PreachSearcher.init(); //index 채우기
 
-		String testament = "요한복음";
-		int chapter = 1;
-		search(testament, chapter);
+		//year month 검색
+		int count = 0;
+		for(int i = YEAR_LOW; i <= YEAR_HIGH; i++) {
+			for(int j = MONTH_LOW; j <= MONTH_HIGH; j++) {
+				List<Preach> result = PreachSearcher.search(i, j);
+				if(!result.isEmpty()) {
+					for (Preach preach : result) {
+						count++;
+						if(!verseValidCheck(preach)) {
+							System.out.println("데이터생성오류있음");
+						}
+					}
+				}
+			}
+		}
+		System.out.println(count);
 		
-		int year = 2021;
-		int month = 12;
-		search(year, month);
+		//testament chapter 검색
+		count = 0;
+		for(int i = 0; i < PreachSearcher.TESTAMENTS.length; i++) {
+			String testament = PreachSearcher.TESTAMENTS[i];
+			for(int j = CHAPTER_LOW; j <= CHAPTER_HIGH; j++) {
+				List<Preach> result = PreachSearcher.search(testament, j);
+				if(!result.isEmpty()) {
+					for (Preach preach : result) {
+						count++;
+						if(!verseValidCheck(preach)) {
+							System.out.println("데이터생성오류있음");
+						}
+					}
+				}
+			}
+		}
+		System.out.println(count);
+		
+		File searchResult = new File("./result");
+		
+		try(FileWriter w = new FileWriter(searchResult)){
+			//year month 검색
+			for(int i = YEAR_LOW; i <= YEAR_HIGH; i++) {
+				for(int j = MONTH_LOW; j <= MONTH_HIGH; j++) {
+					List<Preach> result = PreachSearcher.search(i, j);
+					if(!result.isEmpty()) {
+						w.write(i + "년 " + j + "월 설교 목록\n");
+						for (Preach preach : result) {
+							w.write(preach.toString() + "\n");
+						}
+					}
+				}
+			}
+
+			//testament chapter 검색
+			for(int i = 0; i < PreachSearcher.TESTAMENTS.length; i++) {
+				String testament = PreachSearcher.TESTAMENTS[i];
+				for(int j = CHAPTER_LOW; j <= CHAPTER_HIGH; j++) {
+					List<Preach> result = PreachSearcher.search(testament, j);
+					if(!result.isEmpty()) {
+						w.write(testament + "의 " + j + "장 설교 목록\n");
+						for (Preach preach : result) {
+							w.write(preach.toString() + "\n");
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public static Preach generateData() {
+		Random random = new Random();
+
+		//0 - 62
+		int testamentIndex = random.nextInt(PreachSearcher.TESTAMENTS.length);
+		String testament = PreachSearcher.TESTAMENTS[testamentIndex];
+		//2000 - 2021
+		int year = random.nextInt(YEAR_HIGH - YEAR_LOW + 1) + YEAR_LOW;
+		//1 - 12
+		int month = random.nextInt(MONTH_HIGH) + MONTH_LOW;
+		//1 - 31
+		int date = random.nextInt(DATE_HIGH) + DATE_LOW;
+		
+		//1 - 150
+		int chapter = random.nextInt(CHAPTER_HIGH) + CHAPTER_LOW;
+		//1 - 99
+		int verseStart = random.nextInt(VERSE_HIGH) + VERSE_LOW;
+		//start - 99
+		int verseEnd = random.nextInt(VERSE_HIGH - verseStart + 1) + verseStart;
+		
+		return new Preach(year, month, date, "", testament, chapter, verseStart, verseEnd);
+	}
+	
+	public static boolean verseValidCheck(Preach preach) {
+		if(preach.getVerseRange().getEnd() < preach.getVerseRange().getStart()) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	public static void search(String testament, int chapter) {
-		List<Preach> result = PreachSearcher.getPreachListByTestamentAndChapter(testament, chapter);
+		List<Preach> result = PreachSearcher.search(testament, chapter);
 		
 		System.out.println("search keyword : " + testament + " " + chapter + "장(편)");
 		for(Preach p : result) {
@@ -99,7 +199,7 @@ public class DataTest {
 	}
 	
 	public static void search(int year, int month) {
-		List<Preach> result = PreachSearcher.getPreachListByYearAndMonth(year, month);
+		List<Preach> result = PreachSearcher.search(year, month);
 		
 		System.out.println("search keyword : " + year + "년 " + month + "월");
 		for(Preach p : result) {
