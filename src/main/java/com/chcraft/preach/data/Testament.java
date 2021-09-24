@@ -1,10 +1,9 @@
 package com.chcraft.preach.data;
 
 public class Testament {
-	//±¸¾àÀÎÁö ½Å¾àÀÎÁö
+	//êµ¬ì•½, ì‹ ì•½
 	private boolean old;
-	//ÀÌ¸§
 	private String name;
-	//ÃÑ ¸îÀå(Æí)ÀÎÁö
 	private int totalChapter;
+	private Chapter[] chapters;
 }
