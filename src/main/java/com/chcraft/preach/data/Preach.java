@@ -3,10 +3,6 @@ package com.chcraft.preach.data;
 import java.io.Serializable;
 
 public class Preach implements Serializable{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	//날짜
 	private PreachDate date;
 	//설교제목
@@ -68,13 +64,9 @@ public class Preach implements Serializable{
 		this.verseRange = verseRange;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
 	@Override
 	public String toString() {
-		return "Preach [preachDate=" + date + ", title=" + title + ", testament=" + testament + ", chapter="
-				+ chapter + ", verseRange=" + verseRange + "]";
+		return date.getYear() + "년 " + date.getMonth() + "월 " + date.getDate() + "일 " + 
+			   testament + " " + chapter + "장 " + verseRange.getStart() + " - " + verseRange.getEnd() + "절, \"" + title + "\"";
 	}
 }
