@@ -1,5 +1,6 @@
 package com.chcraft.preach.data;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -101,7 +102,14 @@ public class PreachSearcher {
 		if(fileExist) {
 			//read data
 			try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
-				List<Preach> data = (List<Preach>) in.readObject();
+				List<Preach> data = new ArrayList<>();
+				Preach object;
+				try {
+					while((object = (Preach)in.readObject())!= null) {
+						data.add(object);
+					}
+				} catch(EOFException e) {
+				}
 				
 				for(Preach preach : data) {
 					//indexing by testament에 저장

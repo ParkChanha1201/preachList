@@ -1,5 +1,6 @@
 package com.chcraft.preach.data;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 public class DataTest {
-	final static int DATA_COUNT = 5000;
+	final static int DATA_COUNT = 100000;
 	
 	final static int YEAR_LOW = 2000;
 	final static int YEAR_HIGH = 2021;
@@ -29,21 +30,23 @@ public class DataTest {
 	
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
 		File file = new File("./data/data");
-
 		
 		//test with List
 		List<Preach> test = new ArrayList<>();
 		
 		//generate data and save
-		for(int i = 0; i < DATA_COUNT; i++) {
-			Preach preach = generateData();
-			test.add(preach);
-		}
+//		for(int i = 0; i < DATA_COUNT; i++) {
+//			Preach preach = generateData();
+//			test.add(preach);
+//		}
 
 		try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
 			ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));) {
 			//write to file
-			out.writeObject(test);
+			for(int i = 0; i < DATA_COUNT; i++) {
+				Preach preach = generateData();
+				out.writeObject(preach);
+			}
 			/*
 			//read test
 			Object data = in.readObject();
@@ -104,7 +107,7 @@ public class DataTest {
 				}
 			}
 		}
-		System.out.println(count);
+		System.out.println("year month 검색 개수 : " + count);
 		
 		//testament chapter 검색
 		count = 0;
@@ -122,11 +125,12 @@ public class DataTest {
 				}
 			}
 		}
-		System.out.println(count);
+		System.out.println("testament chapter 검색 개수 : " + count);
 		
 		File searchResult = new File("./result");
+//		File lineStoreTest = new File("./data/lineStore");
 		
-		try(FileWriter w = new FileWriter(searchResult)){
+		try(FileWriter w = new FileWriter(searchResult);){
 			//year month 검색
 			for(int i = YEAR_LOW; i <= YEAR_HIGH; i++) {
 				for(int j = MONTH_LOW; j <= MONTH_HIGH; j++) {
@@ -139,7 +143,6 @@ public class DataTest {
 					}
 				}
 			}
-
 			//testament chapter 검색
 			for(int i = 0; i < PreachSearcher.TESTAMENTS.length; i++) {
 				String testament = PreachSearcher.TESTAMENTS[i];
@@ -154,6 +157,38 @@ public class DataTest {
 				}
 			}
 		}
+		
+		//리스트로 저장하는거랑 리스트에 안넣고 저장하는거 읽는 속도 비교
+		long start;
+		long end;
+		try(ObjectInputStream in2 = new ObjectInputStream(new FileInputStream(file));){
+			System.out.println("리스트에 안넣고 저장한거 수행시간(ns)");
+			start = System.nanoTime();
+			List<Preach> list = new ArrayList<>();
+			Preach preach;
+			try {
+				while((preach = (Preach)in2.readObject())!= null) {
+					list.add(preach);
+				}
+			} catch(EOFException e) {
+			}
+			end = System.nanoTime();
+			System.out.println("제대로 읽었는지 체크 : " + list.size());
+			System.out.println("수행시간: " + (end - start) + " ns");
+		}
+		/*
+		try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));){
+			System.out.println("리스트로 저장한거 수행시간(ns)");
+			start = System.nanoTime();
+			List<Preach> list = (List<Preach>)in.readObject();
+			end = System.nanoTime();
+			System.out.println("제대로 읽었는지 체크 : " + list.size());
+			System.out.println("수행시간: " + (end - start) + " ns");
+		}
+		*/
+		//리스트가 미세하게 좋으나 차이가 별로 없으니 리스트에 안넣고 저장해서 확장하기 편하게 할것임
+		
+		
 	}
 	
 	public static Preach generateData() {
