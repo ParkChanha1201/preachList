@@ -1,13 +1,9 @@
 package com.chcraft.preach.data;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
-public class PreachDate implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
+public class PreachDate implements Serializable, Comparator<PreachDate>{
 	private int year;
 	private int month;
 	private int date;
@@ -45,10 +41,6 @@ public class PreachDate implements Serializable {
 		this.date = date;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -80,5 +72,18 @@ public class PreachDate implements Serializable {
 	@Override
 	public String toString() {
 		return "PreachDate [year=" + year + ", month=" + month + ", date=" + date + "]";
+	}
+
+	@Override
+	public int compare(PreachDate o1, PreachDate o2) {
+		if(Integer.compare(o1.year, o2.year) != 0) {
+			return Integer.compare(o1.year, o2.year);
+		} else if(Integer.compare(o1.month, o2.month) != 0){
+			return Integer.compare(o1.month, o2.month);
+		} else if(Integer.compare(o1.date, o2.date) != 0) {
+			return Integer.compare(o1.date, o2.date);
+		}
+		
+		return 0;
 	}
 }

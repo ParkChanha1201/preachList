@@ -86,7 +86,10 @@ public class PreachSearcher {
 	//년도 , 월 , 설교
 	private static Map<Integer, Map<Integer, List<Preach>>> indexingByDate;
 	
+	private static boolean hasData;
+	
 	static {
+		hasData = false;
 		indexingByTestament = new HashMap<>();
 		for(String testament : TESTAMENTS) {
 			indexingByTestament.put(testament, new HashMap<>());
@@ -100,6 +103,7 @@ public class PreachSearcher {
 		boolean fileExist = !file.createNewFile();
 		
 		if(fileExist) {
+			hasData = true;
 			//read data
 			try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))){
 				List<Preach> data = new ArrayList<>();
@@ -138,8 +142,35 @@ public class PreachSearcher {
 			}
 		} else {
 			//no data
+			hasData = false;
 			return;
 		}
+	}
+	
+	public static void add(Preach preach) {
+		//indexing by testament에 저장
+		String testament = preach.getTestament();
+		int chapter = preach.getChapter();
+		Map<Integer, List<Preach>> byTestaments = indexingByTestament.get(testament);
+		if(!byTestaments.containsKey(chapter)) {
+			byTestaments.put(chapter, new ArrayList<>());
+		}
+		List<Preach> byTestamentsChapter = byTestaments.get(chapter);
+		byTestamentsChapter.add(preach);
+		
+		//indexing by date에 저장
+		int year = preach.getDate().getYear();
+		int month = preach.getDate().getMonth();
+		if(!indexingByDate.containsKey(year)) {
+			indexingByDate.put(year, new HashMap<>());
+		}
+		Map<Integer, List<Preach>> byYear = indexingByDate.get(year);
+		if(!byYear.containsKey(month)) {
+			byYear.put(month, new ArrayList<>());
+		}
+		List<Preach> byYearMonth = byYear.get(month);
+		byYearMonth.add(preach);
+		hasData = true;
 	}
 	
 	public static List<Preach> search(int year, int month){
@@ -172,5 +203,9 @@ public class PreachSearcher {
 		
 		result = indexingByTestament.get(testament).get(chapter);
 		return result;
+	}
+	
+	public static boolean hasData() {
+		return hasData;
 	}
 }
