@@ -91,7 +91,7 @@ public class PreachSearchUI extends JFrame {
 		File data = new File("./data/data");
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 954, 612);
+		setBounds(100, 100, 1201, 830);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -150,12 +150,12 @@ public class PreachSearchUI extends JFrame {
 					.addComponent(lblMonth)
 					.addGap(18)
 					.addComponent(btnSearchDate)
-					.addGap(35))
+					.addContainerGap(35, Short.MAX_VALUE))
 		);
 		gl_searchDatePanel.setVerticalGroup(
 			gl_searchDatePanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_searchDatePanel.createSequentialGroup()
-					.addGap(9)
+				.addGroup(Alignment.TRAILING, gl_searchDatePanel.createSequentialGroup()
+					.addContainerGap(13, Short.MAX_VALUE)
 					.addGroup(gl_searchDatePanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(monthSpinner, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblMonth)
@@ -170,32 +170,84 @@ public class PreachSearchUI extends JFrame {
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		
+		JPanel searchYearPanel = new JPanel();
+		searchYearPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		
+		JSpinner yearSpinner_1 = new JSpinner();
+		yearSpinner_1.setModel(new SpinnerNumberModel(new Integer(2021), new Integer(1970), null, new Integer(1)));
+		yearSpinner_1.setFont(new Font("굴림", Font.PLAIN, 20));
+		
+		JLabel lblYear_1 = new JLabel("년");
+		lblYear_1.setFont(new Font("굴림", Font.PLAIN, 20));
+		
+		JButton btnSearchDate_1 = new JButton("검  색");
+		btnSearchDate_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int year = (Integer)yearSpinner_1.getValue();
+				List<Preach> result = PreachSearcher.search(year);
+				result.sort(new Comparator<Preach>() {
+					@Override
+					public int compare(Preach o1, Preach o2) {
+						return o1.getDate().compare(o1.getDate(), o2.getDate());
+					}
+				});
+				searchResultlist.setListData(result.toArray(new Preach[result.size()]));
+			}
+		});
+		btnSearchDate_1.setFont(new Font("굴림", Font.PLAIN, 20));
+		GroupLayout gl_searchYearPanel = new GroupLayout(searchYearPanel);
+		gl_searchYearPanel.setHorizontalGroup(
+			gl_searchYearPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_searchYearPanel.createSequentialGroup()
+					.addGap(21)
+					.addComponent(yearSpinner_1, GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(lblYear_1, GroupLayout.PREFERRED_SIZE, 29, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(btnSearchDate_1)
+					.addContainerGap(24, Short.MAX_VALUE))
+		);
+		gl_searchYearPanel.setVerticalGroup(
+			gl_searchYearPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(Alignment.TRAILING, gl_searchYearPanel.createSequentialGroup()
+					.addContainerGap(13, Short.MAX_VALUE)
+					.addGroup(gl_searchYearPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(yearSpinner_1, GroupLayout.PREFERRED_SIZE, 32, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblYear_1)
+						.addComponent(btnSearchDate_1))
+					.addContainerGap())
+		);
+		searchYearPanel.setLayout(gl_searchYearPanel);
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_contentPane.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addGroup(Alignment.LEADING, gl_contentPane.createParallelGroup(Alignment.LEADING, false)
-							.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 893, Short.MAX_VALUE)
-							.addGroup(gl_contentPane.createSequentialGroup()
-								.addComponent(searchTestamentPanel, GroupLayout.PREFERRED_SIZE, 410, GroupLayout.PREFERRED_SIZE)
-								.addGap(35)
-								.addComponent(searchDatePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))))
-					.addContainerGap(25, Short.MAX_VALUE))
-		);
-		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-						.addComponent(searchDatePanel, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-						.addComponent(searchTestamentPanel, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 1135, Short.MAX_VALUE)
+						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 1135, Short.MAX_VALUE)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(searchTestamentPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(searchDatePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(searchYearPanel, GroupLayout.PREFERRED_SIZE, 309, GroupLayout.PREFERRED_SIZE)))
+					.addGap(137))
+		);
+		gl_contentPane.setVerticalGroup(
+			gl_contentPane.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+						.addComponent(searchYearPanel, GroupLayout.PREFERRED_SIZE, 54, Short.MAX_VALUE)
+						.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+							.addComponent(searchDatePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(searchTestamentPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+					.addGap(22)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 95, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 376, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 562, GroupLayout.PREFERRED_SIZE)
 					.addGap(18))
 		);
 		
@@ -389,34 +441,35 @@ public class PreachSearchUI extends JFrame {
 		GroupLayout gl_searchTestamentPanel = new GroupLayout(searchTestamentPanel);
 		gl_searchTestamentPanel.setHorizontalGroup(
 			gl_searchTestamentPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_searchTestamentPanel.createSequentialGroup()
-					.addGap(31)
+				.addGroup(Alignment.TRAILING, gl_searchTestamentPanel.createSequentialGroup()
+					.addContainerGap(19, Short.MAX_VALUE)
 					.addComponent(testamentCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addGap(5)
 					.addComponent(chapterSpinner, GroupLayout.PREFERRED_SIZE, 66, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblChapter)
-					.addGap(5)
-					.addComponent(btnSearchTestament))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnSearchTestament)
+					.addContainerGap())
 		);
 		gl_searchTestamentPanel.setVerticalGroup(
 			gl_searchTestamentPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_searchTestamentPanel.createSequentialGroup()
-					.addGroup(gl_searchTestamentPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_searchTestamentPanel.createSequentialGroup()
-							.addGap(6)
-							.addComponent(testamentCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_searchTestamentPanel.createSequentialGroup()
-							.addGap(9)
-							.addComponent(lblChapter))
-						.addGroup(gl_searchTestamentPanel.createSequentialGroup()
-							.addGap(5)
-							.addComponent(btnSearchTestament)))
+				.addGroup(Alignment.TRAILING, gl_searchTestamentPanel.createSequentialGroup()
+					.addGap(9)
+					.addComponent(chapterSpinner, GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+					.addGap(7))
+				.addGroup(Alignment.TRAILING, gl_searchTestamentPanel.createSequentialGroup()
+					.addContainerGap(11, Short.MAX_VALUE)
+					.addComponent(btnSearchTestament)
+					.addGap(8))
+				.addGroup(Alignment.TRAILING, gl_searchTestamentPanel.createSequentialGroup()
+					.addContainerGap(17, Short.MAX_VALUE)
+					.addComponent(lblChapter)
+					.addGap(13))
+				.addGroup(Alignment.TRAILING, gl_searchTestamentPanel.createSequentialGroup()
+					.addContainerGap(16, Short.MAX_VALUE)
+					.addComponent(testamentCombo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
-				.addGroup(gl_searchTestamentPanel.createSequentialGroup()
-					.addGap(5)
-					.addComponent(chapterSpinner, GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
-					.addGap(11))
 		);
 		searchTestamentPanel.setLayout(gl_searchTestamentPanel);
 		contentPane.setLayout(gl_contentPane);
