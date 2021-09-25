@@ -173,6 +173,21 @@ public class PreachSearcher {
 		hasData = true;
 	}
 	
+	public static List<Preach> search(int year){
+		List<Preach> result = new ArrayList<>();
+		//if year does not exist, return empty List
+		if(!indexingByDate.containsKey(year)) {
+			return result;
+		}
+
+		//add all values in map<month, List<Preach>> 
+		for(List<Preach> preaches : indexingByDate.get(year).values()) {
+			result.addAll(preaches);
+		}
+		
+		return result;
+	}
+	
 	public static List<Preach> search(int year, int month){
 		List<Preach> result;
 		//if year does not exist, return empty List
